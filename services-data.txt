@@ -1,0 +1,31 @@
+Services from original site:
+
+1. Prima Visita Nutrizionale
+   - Description: Valutazione completa dello stato nutrizionale, analisi delle abitudini alimentari e definizione degli obiettivi. Include misurazione composizione corporea e piano alimentare personalizzato.
+   - Duration: 60 minuti
+   - Price: 90.00€ (9000 cents)
+
+2. Visita di controllo
+   - Description: Rivalutazione dei progressi del paziente. Eventuali modifiche al piano nutrizionale inviato.
+   - Duration: 40 minuti
+   - Price: 50.00€ (5000 cents)
+
+3. Prima visita Online
+   - Description: Consulenza nutrizionale svolta attraverso piattaforme digitali. Per maggiori informazioni sullo svolgimento online contattami!
+   - Duration: 60 minuti
+   - Price: 70.00€ (7000 cents)
+
+4. Visita di controllo online
+   - Description: Rivalutazione del paziente ed eventuale cambio della strategia nutrizionale.
+   - Duration: 24 minuti
+   - Price: 40.00€ (4000 cents)
+
+5. Educazione Alimentare
+   - Description: Sessione educativa su temi specifici: lettura etichette, spesa consapevole, organizzazione pasti, cucina salutare. Ideale per famiglie e gruppi.
+   - Duration: 60 minuti
+   - Price: 70.00€ (7000 cents)
+
+6. Analisi della composizione corporea (MetaDieta BIA)
+   - Description: Analisi della composizione corporea con MetaDieta BIA
+   - Duration: 20 minuti
+   - Price: 20.00€ (2000 cents)

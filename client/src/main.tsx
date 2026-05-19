@@ -4,13 +4,14 @@
  * ClerkProvider gestisce l'autenticazione globalmente.
  * VITE_CLERK_PUBLISHABLE_KEY deve essere configurato nell'environment.
  */
-import { ClerkProvider } from "@clerk/clerk-react";
+import { ClerkProvider, useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { itIT } from "@clerk/localizations";
 import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from "@shared/const";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
+import { useState } from "react";
 import superjson from "superjson";
 import App from "./App";
 import "./index.css";
@@ -54,24 +55,38 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: "/api/trpc",
-      transformer: superjson,
-      async headers() {
-        // Clerk gestisce i token tramite cookie automaticamente
-        return {};
-      },
-      fetch(input, init) {
-        return globalThis.fetch(input, {
-          ...(init ?? {}),
-          credentials: "include",
-        });
-      },
-    }),
-  ],
-});
+/**
+ * Inner component that has access to Clerk context for getting the token
+ */
+function AppWithTrpc() {
+  const { getToken } = useClerkAuth();
+
+  const [trpcClient] = useState(() =>
+    trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: "/api/trpc",
+          transformer: superjson,
+          async headers() {
+            // Invia il token Clerk nell'header Authorization
+            const token = await getToken();
+            return token ? { Authorization: `Bearer ${token}` } : {};
+          },
+        }),
+      ],
+    })
+  );
+
+  return (
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
+      </QueryClientProvider>
+    </trpc.Provider>
+  );
+}
 
 createRoot(document.getElementById("root")!).render(
   <ClerkProvider
@@ -82,12 +97,6 @@ createRoot(document.getElementById("root")!).render(
     afterSignInUrl="/"
     afterSignUpUrl="/"
   >
-    <HelmetProvider>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </trpc.Provider>
-    </HelmetProvider>
+    <AppWithTrpc />
   </ClerkProvider>
 );
