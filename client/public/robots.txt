@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /area-personale/
+
+# Sitemap
+Sitemap: https://ariannapelliccionidietista.it/sitemap.xml

@@ -1,0 +1,104 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1764878825465,
+      "tag": "0000_thin_silk_fever",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1764878990239,
+      "tag": "0001_mature_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764881610896,
+      "tag": "0002_white_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764923236051,
+      "tag": "0003_charming_tarot",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1765143032736,
+      "tag": "0004_round_whizzer",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1765489205651,
+      "tag": "0005_talented_captain_flint",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1765982712210,
+      "tag": "0006_certain_jazinda",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1765982955060,
+      "tag": "0007_thin_reptil",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1765983567055,
+      "tag": "0008_condemned_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1766311850302,
+      "tag": "0009_smiling_frank_castle",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1766313123423,
+      "tag": "0010_chemical_tomorrow_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1766497427366,
+      "tag": "0011_wet_imperial_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1768848464016,
+      "tag": "0012_regular_bedlam",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1774605661786,
+      "tag": "0013_flippant_mephisto",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://QajQyYyGgbu8LZ7.root:0bSi6baQqsje8q2aw8W0@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/JAVPFhYQtsSKvm38HpqNGv?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663236549894/JAVPFhYQtsSKvm38HpqNGv",
+    "access_key_id": "ASIAZV3A2ECZGMQOG4US",
+    "secret_access_key": "x82FxRAS26HtQdh/s1PxidebXc+nbpjxQbqjbqeS",
+    "session_token": "IQoJb3JpZ2luX2VjEJ3//////////wEaCXVzLWVhc3QtMSJIMEYCIQD2UeGYHgXXVpU6sX0AgP1nt8CnIl5LkHF6/JbOU/klzQIhAOws0i+YXqGH98UZ2qfODPDZs1taiE1iwkG4b4O7UHO2KvYDCGYQBBoMNjY1Mzg2MDk4ODY2Igwy1El/3nTLoQ6WwHsq0wM32vV2VlLpBZwEB1WWhCBqsDB8DCIr4ZLvHW1Om6XaOc6GO47aUtPC0ozq1XPUV+CH90u40xW+v91o0kd0Lj5BZZUWfABCmnueri0C5wu/3fqYER2Dr6wciHU9/SxNY/6en7WDSxbeVNJ8cJaUzL5p3AEgesZcfw4Xf7Hs4IXlkCoKgmCC/eJrgAJvGjvkKblaRN2oqYixv4gSj8E5DD3UvjgrdhQYCPgdrwcx+h+DL5sIW7fXUsDzRpuI+7RXjVEQIRyZ7K11Tw0hv0sImMZqYEYH2w1Frxtk/tR/X6iWRGQnS9h1qe4NdkkeLTtV1I7ICaddQtIhhKYHeTgpggHzNHxB9cvKeTWlmXYf5IRZHPurREq00IF7tgojroZMSrcN2nRsyR8pZdh/7HWn/lCZeu+ux1tLAfrlnWCexbrHjpiFdjSRgfCv5mcy9zeUZYfbb1457w/vep7FYO571e11a+feny63soZNDKO74UZx/NDca9XzRHWTEjZ/3DFy+rVdOmHMc9LhT/FwDsla/HeHG4vjhbGOfySw6Z/jxDPzdsdnfPuBHf8O/5tsrXFyjEsw7mijRpwpfDGaLA3uU2FdPFyL1fioRSLtMiOeTbM2+6/rnDCV7JjQBjqcAWwzcWr3sbYqMWzCOgKTwnomQFPUQAy1PSyEWrO0zC3XmIl3n1ksX+h16bOK0vCtUko5M5vSF++w6GIG3Dg1Y9qXqkLuZlTKWgNoK0WEe6T23Y6dDNYMIBKsrlsKvs8D1oGGxfifSVR9k8AreM2pL0pwnrrHB61vDqU/rUu7e2vSwXQ5n0ObKeYIDcvUq5BI9vgrfG3s3DTeRF/ZXw==",
+    "expiration": "2026-05-15T08:52:37.000Z"
+  },
+  "name": "dietista-website",
+  "path": "/home/ubuntu/dietista-website",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "fXZWnb3e2Pkcg4AVvNHajJ",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "jLq9umi3uJyfdGAKhrYBw6",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Io Rossi",
+    "OWNER_OPEN_ID": "XNUCmyAZD3if5BpfbPLNUp",
+    "STRIPE_SECRET_KEY": "sk_test_51SaJPX2QvRDhdmC7eAm5oXjJsIwpuuLdMoXmHG4Ict6D3diqL5cGfVsAepD1ssGLe37DHqrwIKIJLanv6EEoPWoZ00Tfz5zVby",
+    "STRIPE_WEBHOOK_SECRET": "whsec_ruGSvmgCNG3479KmJLb1jKOG6Exns8X7",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "e027fd3d-e6ed-4ccf-85f6-4d92f109285f",
+    "VITE_APP_ID": "JAVPFhYQtsSKvm38HpqNGv",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663236549894/VsdHwgRqreaMjzAe.png",
+    "VITE_APP_TITLE": "Dietista Arianna Pelliccioni",
+    "VITE_FRONTEND_FORGE_API_KEY": "jt5vDG9DgVDucHaNPn2BY5",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im",
+    "VITE_STRIPE_PUBLISHABLE_KEY": "pk_test_51SaJPX2QvRDhdmC7YuIs76ErBcfrpA1nDAbXHw6B36rBjULIIa359WKY5BrylJzrT8uRHbV9Tw03cPMtqQRqOXoN00XQl2FTQZ"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}
