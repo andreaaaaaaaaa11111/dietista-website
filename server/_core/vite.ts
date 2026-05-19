@@ -3,8 +3,13 @@ import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
+import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
+
+// Compatible with Node 18 (import.meta.dirname is Node 21+)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
@@ -26,7 +31,7 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        __dirname,
         "../..",
         "client",
         "index.html"
@@ -51,7 +56,7 @@ export function serveStatic(app: Express) {
   // In produzione (Railway), il frontend è servito da Vercel.
   // Il backend serve solo l'API. Questa funzione è mantenuta per
   // compatibilità con ambienti dove frontend e backend sono uniti.
-  const distPath = path.resolve(import.meta.dirname, "public");
+  const distPath = path.resolve(__dirname, "public");
   if (!fs.existsSync(distPath)) {
     console.log(
       `[Static] Frontend build non trovato in ${distPath}. ` +
