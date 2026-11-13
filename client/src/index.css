@@ -4,6 +4,21 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-emerald-50: color-mix(in srgb, var(--brand-green) 4%, white);
+  --color-emerald-100: color-mix(in srgb, var(--brand-green) 8%, white);
+  --color-emerald-200: color-mix(in srgb, var(--brand-green) 18%, white);
+  --color-emerald-300: color-mix(in srgb, var(--brand-green) 28%, white);
+  --color-emerald-400: var(--brand-green);
+  --color-emerald-500: var(--brand-green);
+  --color-emerald-600: var(--brand-green);
+  --color-emerald-700: var(--brand-green);
+  --color-emerald-800: var(--brand-green);
+  --color-emerald-950: var(--brand-green);
+  --color-green-100: color-mix(in srgb, var(--brand-green) 8%, white);
+  --color-green-500: var(--brand-green);
+  --color-green-600: var(--brand-green);
+  --color-green-700: var(--brand-green);
+  --color-green-800: var(--brand-green);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -43,14 +58,15 @@
 }
 
 :root {
-  /* Palette elegante per dietista - verde salvia e neutri raffinati */
-  --primary: oklch(0.62 0.15 155); /* Verde salvia elegante */
+  /* Unico verde del marchio; superfici chiare derivate dallo stesso colore. */
+  --brand-green: #153927;
+  --primary: var(--brand-green);
   --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.62 0.15 155);
+  --sidebar-primary: var(--brand-green);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --chart-1: oklch(0.75 0.12 155);
-  --chart-2: oklch(0.65 0.14 155);
-  --chart-3: oklch(0.55 0.16 155);
+  --chart-1: var(--brand-green);
+  --chart-2: var(--brand-green);
+  --chart-3: var(--brand-green);
   --chart-4: oklch(0.75 0.12 85);
   --chart-5: oklch(0.65 0.10 85);
   --radius: 0.75rem;
@@ -60,7 +76,7 @@
   --card-foreground: oklch(0.20 0.01 155);
   --popover: oklch(0.98 0.005 155);
   --popover-foreground: oklch(0.20 0.01 155);
-  --secondary: oklch(0.88 0.03 155); /* Verde chiaro delicato */
+  --secondary: color-mix(in srgb, var(--brand-green) 10%, white);
   --secondary-foreground: oklch(0.25 0.02 155);
   --muted: oklch(0.94 0.01 155);
   --muted-foreground: oklch(0.50 0.02 155);
@@ -70,19 +86,19 @@
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.90 0.01 155);
   --input: oklch(0.90 0.01 155);
-  --ring: oklch(0.62 0.15 155);
+  --ring: var(--brand-green);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.20 0.01 155);
   --sidebar-accent: oklch(0.94 0.01 155);
   --sidebar-accent-foreground: oklch(0.20 0.01 155);
   --sidebar-border: oklch(0.90 0.01 155);
-  --sidebar-ring: oklch(0.62 0.15 155);
+  --sidebar-ring: var(--brand-green);
 }
 
 .dark {
-  --primary: var(--color-blue-700);
+  --primary: var(--brand-green);
   --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary: var(--brand-green);
   --sidebar-primary-foreground: var(--color-blue-50);
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.85 0.005 65);
@@ -178,6 +194,70 @@
       padding-left: 2rem; /* 32px - desktop padding */
       padding-right: 2rem;
       max-width: 1280px; /* Standard content width */
+    }
+  }
+
+  /* Area amministrativa: superfici leggere e coerenti in stile Apple. */
+  .admin-shell h1,
+  .admin-shell h2,
+  .admin-shell h3,
+  .admin-shell h4,
+  .admin-shell h5,
+  .admin-shell h6 {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  .admin-shell [data-slot="card"] {
+    border-color: rgba(255, 255, 255, 0.82);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 14px 42px rgba(15, 23, 42, 0.065), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+  }
+
+  .admin-shell [data-slot="card-header"] {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .admin-shell [data-slot="card-content"] {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .admin-shell table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .admin-shell thead tr {
+    background: rgba(241, 245, 249, 0.66);
+  }
+
+  .admin-shell tbody tr {
+    transition: background-color 180ms ease;
+  }
+
+  .admin-shell tbody tr:hover {
+    background: rgba(248, 250, 252, 0.9);
+  }
+
+  .admin-shell input,
+  .admin-shell textarea,
+  .admin-shell select {
+    background-color: rgba(255, 255, 255, 0.82);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .admin-shell *,
+    .admin-shell *::before,
+    .admin-shell *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
     }
   }
 }

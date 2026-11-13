@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,26 +10,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, LogOut, LayoutDashboard } from "lucide-react";
+import { User, LogOut, Calendar, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
-import { useClerk } from "@clerk/clerk-react";
-import { Link } from "wouter";
+import { useState } from "react";
 
-export default function UserMenu() {
+interface UserMenuProps {
+  onDark?: boolean;
+}
+
+export default function UserMenu({ onDark = false }: UserMenuProps) {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
-  const { openSignIn } = useClerk();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success("Logout effettuato");
-      window.location.href = "/";
-    } catch {
-      toast.error("Errore durante il logout");
-    }
-  };
+  const [loggingOut, setLoggingOut] = useState(false);
 
   if (loading) {
     return (
@@ -38,8 +32,11 @@ export default function UserMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <Button onClick={() => openSignIn()}>
-        Accedi
+      <Button
+        asChild
+        className={onDark ? "bg-white text-[#153927] hover:bg-emerald-50 hover:text-[#153927]" : undefined}
+      >
+        <a href={getLoginUrl()}>Accedi</a>
       </Button>
     );
   }
@@ -56,8 +53,8 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center space-x-2 focus:outline-none">
-          <Avatar className="h-10 w-10 cursor-pointer border-2 border-primary/20 hover:border-primary transition-colors">
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+          <Avatar className={`h-10 w-10 cursor-pointer border-2 transition-colors ${onDark ? "border-white/30 hover:border-white" : "border-primary/20 hover:border-primary"}`}>
+            <AvatarFallback className={onDark ? "bg-white/15 font-semibold text-white" : "bg-primary/10 font-semibold text-primary"}>
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -91,7 +88,15 @@ export default function UserMenu() {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem
+          onClick={async () => {
+            setLoggingOut(true);
+            await logout();
+            toast.success("Logout effettuato");
+            window.location.href = "/";
+          }}
+          disabled={loggingOut}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Esci</span>
         </DropdownMenuItem>

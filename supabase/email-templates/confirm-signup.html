@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Benvenuto/a</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f4f7f3;font-family:Arial,Helvetica,sans-serif;color:#172019;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f7f3;">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #dde7df;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(35,74,50,.08);">
+            <tr>
+              <td align="center" style="padding:32px 32px 22px;background:#f9fbf8;border-bottom:1px solid #e4ece5;">
+                <img
+                  src="https://ariannapelliccionidietista.it/logo-completo.png"
+                  width="250"
+                  alt="Arianna Pelliccioni Dietista"
+                  style="display:block;width:100%;max-width:250px;height:auto;border:0;"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:38px 38px 18px;">
+                <p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#12a65d;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+                  Benvenuto/a
+                </p>
+                <h1 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.2;color:#172019;">
+                  {{ if .Data.name }}Ciao {{ .Data.name }},{{ else }}Ciao,{{ end }}
+                </h1>
+                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:#59675d;">
+                  grazie per esserti registrato/a. Il tuo spazio personale è quasi pronto: conferma il tuo indirizzo email per accedere al tuo percorso nutrizionale.
+                </p>
+                <p style="margin:0 0 28px;font-size:16px;line-height:1.7;color:#59675d;">
+                  Dopo la conferma potrai consultare le tue richieste e restare in contatto con lo studio in modo semplice e protetto.
+                </p>
+
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 28px;">
+                  <tr>
+                    <td align="center" bgcolor="#12a65d" style="border-radius:10px;">
+                      <a
+                        href="{{ .ConfirmationURL }}"
+                        style="display:inline-block;padding:15px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;border-radius:10px;"
+                      >
+                        Conferma il mio account
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <div style="padding:18px 20px;background:#f3f8f4;border-left:4px solid #12a65d;border-radius:8px;">
+                  <p style="margin:0;font-size:13px;line-height:1.6;color:#667269;">
+                    Se non hai richiesto tu la registrazione, puoi ignorare questa email. Il tuo account non verrà attivato.
+                  </p>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:22px 38px 34px;">
+                <p style="margin:0 0 4px;font-size:15px;line-height:1.6;color:#36433a;">
+                  A presto,<br />
+                  <strong>Dott.ssa Arianna Pelliccioni</strong>
+                </p>
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#79847c;">
+                  Dietista · Nutrizione personalizzata per il tuo benessere
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <p style="max-width:600px;margin:18px auto 0;font-size:11px;line-height:1.5;color:#8a958d;text-align:center;">
+            Hai ricevuto questa email perché è stata richiesta la creazione di un account sul sito di Arianna Pelliccioni Dietista.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

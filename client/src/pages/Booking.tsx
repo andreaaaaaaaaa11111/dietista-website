@@ -20,6 +20,8 @@ import {
   ClipboardList,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import BetterNotice from "@/components/BetterNotice";
+import { getBetterOffers } from "@shared/betterOffers";
 
 type FormData = {
   serviceId: string;
@@ -57,9 +59,14 @@ export default function Booking() {
   const [, setLocation] = useLocation();
   const [submitted, setSubmitted] = useState(false);
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
+  const [formData, setFormData] = useState<FormData>(() => {
+    const requestedService = new URLSearchParams(window.location.search).get("servizio") ?? "";
+    return { ...EMPTY_FORM, serviceId: requestedService };
+  });
 
   const { data: services, isLoading: servicesLoading } = trpc.services.list.useQuery();
+  const betterOffers = getBetterOffers(services);
+  const selectedBetter = betterOffers.find(offer => offer.key === formData.serviceId);
 
   const submitMutation = trpc.consultations.submit.useMutation({
     onSuccess: () => {
@@ -96,6 +103,8 @@ export default function Booking() {
       return;
     }
     submitMutation.mutate({
+      serviceId: selectedBetter ? selectedBetter.source.id : formData.serviceId ? Number(formData.serviceId) : undefined,
+      betterOffer: selectedBetter?.key,
       name: formData.name,
       email: formData.email,
       phone: formData.phone || undefined,
@@ -230,6 +239,7 @@ export default function Booking() {
 
         <Card className="shadow-lg">
           <CardHeader className="pb-2">
+            {selectedBetter && <BetterNotice />}
             <ProgressBar />
             <CardTitle className="text-xl">
               {step === 1 ? "Dati di Contatto" : "Informazioni Cliniche"}
@@ -257,13 +267,18 @@ export default function Booking() {
                       value={formData.serviceId}
                       onValueChange={(v) => update("serviceId", v)}
                     >
-                      <SelectTrigger id="serviceId">
+                      <SelectTrigger id="serviceId" className="w-full min-w-0 [&>span]:truncate">
                         <SelectValue placeholder="Seleziona un servizio (opzionale)" />
                       </SelectTrigger>
                       <SelectContent>
+                        {betterOffers.map(offer => (
+                          <SelectItem key={offer.key} value={offer.key}>
+                            {offer.label} — €{(offer.price / 100).toFixed(0)}
+                          </SelectItem>
+                        ))}
                         {services?.map((s) => (
                           <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.title} — €{(s.price / 100).toFixed(0)}
+                            {s.title}{s.price > 0 ? ` — €${(s.price / 100).toFixed(0)}` : ""}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -420,7 +435,16 @@ export default function Booking() {
                     onChange={(e) => update("privacyConsent", e.target.checked)}
                   />
                   <label htmlFor="privacyConsent" className="text-xs text-muted-foreground cursor-pointer leading-relaxed">
-                    Acconsento al trattamento dei miei dati personali ai sensi del GDPR (Regolamento UE 2016/679) per la gestione della richiesta di consulenza nutrizionale. I dati forniti saranno utilizzati esclusivamente per finalità legate alla prestazione del servizio richiesto e non saranno ceduti a terzi senza il mio consenso. *
+                    <a
+                      href="https://eur-lex.europa.eu/eli/reg/2016/679/oj?locale=IT"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      className="underline decoration-primary/50 underline-offset-2 hover:text-primary"
+                      title="Apri il Regolamento generale sulla protezione dei dati sul sito ufficiale dell'Unione europea"
+                    >
+                      Acconsento al trattamento dei miei dati personali ai sensi del GDPR (Regolamento UE 2016/679) per la gestione della richiesta di consulenza nutrizionale. I dati forniti saranno utilizzati esclusivamente per finalità legate alla prestazione del servizio richiesto e non saranno ceduti a terzi senza il mio consenso.
+                    </a>{" "}*
                   </label>
                 </div>
 

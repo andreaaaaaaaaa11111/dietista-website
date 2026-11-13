@@ -1,12 +1,8 @@
-/**
- * Hook di autenticazione con Clerk (sostituisce Manus OAuth)
- * 
- * Usa Clerk per verificare lo stato di autenticazione.
- * I dati utente completi (con ruolo admin) vengono recuperati dal backend tRPC.
- */
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { getLoginUrl } from "@/const";
+import { supabase } from "@/lib/supabase";
 import { trpc } from "@/lib/trpc";
-import { useCallback, useEffect, useMemo } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -14,71 +10,63 @@ type UseAuthOptions = {
 };
 
 export function useAuth(options?: UseAuthOptions) {
-  const { redirectOnUnauthenticated = false, redirectPath = "/accedi" } =
-    options ?? {};
-
-  const { isLoaded: clerkLoaded, isSignedIn } = useUser();
-  const { signOut } = useClerk();
+  const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } = options ?? {};
+  const [session, setSession] = useState<Session | null>(null);
+  const [initialized, setInitialized] = useState(false);
   const utils = trpc.useUtils();
 
-  // Recupera i dati utente dal backend (include ruolo admin)
+  useEffect(() => {
+    let active = true;
+    if (!supabase) {
+      setInitialized(true);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      setSession(data.session);
+      setInitialized(true);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setInitialized(true);
+      void utils.auth.me.invalidate();
+    });
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [utils.auth.me]);
+
   const meQuery = trpc.auth.me.useQuery(undefined, {
+    enabled: initialized && Boolean(session),
     retry: false,
     refetchOnWindowFocus: false,
-    enabled: clerkLoaded && isSignedIn === true,
   });
 
   const logout = useCallback(async () => {
-    try {
-      await signOut();
-      utils.auth.me.setData(undefined, null);
-      await utils.auth.me.invalidate();
-    } catch (error) {
-      console.error("[Auth] Logout failed:", error);
-    }
-  }, [signOut, utils]);
+    if (supabase) await supabase.auth.signOut();
+    setSession(null);
+    utils.auth.me.setData(undefined, null);
+    await utils.auth.me.invalidate();
+  }, [utils]);
 
   const state = useMemo(() => {
-    const loading = !clerkLoaded || (isSignedIn === true && meQuery.isLoading);
-    const user = meQuery.data ?? null;
-    const isAuthenticated = clerkLoaded && isSignedIn === true && user !== null;
-
+    const user = session ? (meQuery.data ?? null) : null;
+    localStorage.setItem("dietista-user-info", JSON.stringify(user));
     return {
       user,
-      loading,
+      loading: !initialized || (Boolean(session) && meQuery.isLoading),
       error: meQuery.error ?? null,
-      isAuthenticated,
+      isAuthenticated: Boolean(user),
     };
-  }, [
-    clerkLoaded,
-    isSignedIn,
-    meQuery.data,
-    meQuery.error,
-    meQuery.isLoading,
-  ]);
+  }, [initialized, meQuery.data, meQuery.error, meQuery.isLoading, session]);
 
   useEffect(() => {
-    if (!redirectOnUnauthenticated) return;
-    if (state.loading) return;
-    if (state.user) return;
-    if (!clerkLoaded) return;
-    if (isSignedIn) return; // Clerk è loggato ma il DB non ha ancora risposto
-    if (typeof window === "undefined") return;
-    if (window.location.pathname === redirectPath) return;
-
+    if (!redirectOnUnauthenticated || state.loading || state.user) return;
+    if (window.location.pathname === "/accedi") return;
     window.location.href = redirectPath;
-  }, [
-    redirectOnUnauthenticated,
-    redirectPath,
-    state.loading,
-    state.user,
-    clerkLoaded,
-    isSignedIn,
-  ]);
+  }, [redirectOnUnauthenticated, redirectPath, state.loading, state.user]);
 
-  return {
-    ...state,
-    refresh: () => meQuery.refetch(),
-    logout,
-  };
+  return { ...state, refresh: () => meQuery.refetch(), logout };
 }

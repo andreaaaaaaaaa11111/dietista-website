@@ -54,10 +54,7 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      // TiDB Serverless richiede SSL. Aggiungere ssl=true se non presente nella URL.
-      const url = process.env.DATABASE_URL;
-      const mysqlUrl = url.includes('ssl') ? url : `${url}${url.includes('?') ? '&' : '?'}ssl={"rejectUnauthorized":true}`;
-      _db = drizzle(mysqlUrl);
+      _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -103,8 +100,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.email && user.email === ENV.ownerEmail) {
-      // Imposta automaticamente il ruolo admin per l'email del proprietario
+    } else if (user.openId === ENV.ownerOpenId) {
       values.role = 'admin';
       updateSet.role = 'admin';
     }

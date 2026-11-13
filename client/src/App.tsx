@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Header from "./components/Header";
@@ -11,13 +13,15 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Public Pages
 import Home from "./pages/Home";
 import Services from "./pages/Services";
+import SportsNutrition from "./pages/SportsNutrition";
 import About from "./pages/About";
+
 import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import VerifyEmail from "./pages/VerifyEmail";
-import SignInPage from "./pages/SignIn";
-import SignUpPage from "./pages/SignUp";
+import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 
 // User Pages
 import UserDashboard from "./pages/UserDashboard";
@@ -39,6 +43,20 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AnalyticsTracker() {
+  const [location] = useLocation();
+  const track = trpc.analytics.track.useMutation();
+
+  useEffect(() => {
+    if (location.startsWith("/admin")) return;
+    track.mutate({ path: location });
+    // Una visualizzazione viene registrata ad ogni cambio pagina.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
+  return null;
+}
+
 function Router() {
   return (
     <Switch>
@@ -55,6 +73,10 @@ function Router() {
         </PublicLayout>
       </Route>
       
+      <Route path="/nutrizione-sportiva">
+        <PublicLayout><SportsNutrition /></PublicLayout>
+      </Route>
+
       <Route path="/chi-sono">
         <PublicLayout>
           <About />
@@ -86,18 +108,16 @@ function Router() {
         </PublicLayout>
       </Route>
 
-      {/* Clerk Auth Routes */}
       <Route path="/accedi">
-        <SignInPage />
+        <PublicLayout>
+          <Auth />
+        </PublicLayout>
       </Route>
-      <Route path="/accedi/:rest*">
-        <SignInPage />
-      </Route>
-      <Route path="/registrati">
-        <SignUpPage />
-      </Route>
-      <Route path="/registrati/:rest*">
-        <SignUpPage />
+
+      <Route path="/reimposta-password">
+        <PublicLayout>
+          <ResetPassword />
+        </PublicLayout>
       </Route>
 
       {/* User Protected Routes */}
@@ -162,6 +182,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <AnalyticsTracker />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

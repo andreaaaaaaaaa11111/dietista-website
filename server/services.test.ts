@@ -23,7 +23,7 @@ function createAdminContext(): { ctx: TrpcContext } {
     openId: "admin-user",
     email: "admin@dietista.it",
     name: "Admin User",
-    loginMethod: "manus",
+    loginMethod: "oauth",
     role: "admin",
     createdAt: new Date(),
     updatedAt: new Date(),

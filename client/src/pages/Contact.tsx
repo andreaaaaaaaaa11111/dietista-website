@@ -9,6 +9,9 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin } from "lucide-react";
 import SEO from "@/components/SEO";
+import { Link } from "wouter";
+import BetterNotice from "@/components/BetterNotice";
+import { getBetterOffers } from "@shared/betterOffers";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -18,6 +21,12 @@ export default function Contact() {
     consultationType: "",
     message: "",
   });
+  const { data: services } = trpc.services.list.useQuery();
+  const betterOffers = getBetterOffers(services);
+  const selectedBetter = betterOffers.find(offer => offer.label === formData.consultationType);
+  const selectedService = services?.find(service => service.title === formData.consultationType);
+  const bookingSelection = selectedBetter?.key ?? selectedService?.id;
+  const bookingHref = bookingSelection ? `/prenota?servizio=${bookingSelection}` : "/prenota";
 
   const submitMutation = trpc.contact.submit.useMutation({
     onSuccess: () => {
@@ -63,10 +72,11 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Contact Form */}
           <Card className="border-2">
             <CardHeader>
+              {selectedBetter && <BetterNotice />}
               <CardTitle>Invia una Richiesta</CardTitle>
               <CardDescription>
                 Compila il form e ti risponderò entro 24 ore
@@ -116,16 +126,28 @@ export default function Contact() {
                       setFormData({ ...formData, consultationType: value })
                     }
                   >
-                    <SelectTrigger id="consultationType">
+                    <SelectTrigger id="consultationType" className="w-full min-w-0 [&>span]:truncate">
                       <SelectValue placeholder="Seleziona il tipo di consulenza" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="consulenza-nutrizionale">Consulenza Nutrizionale</SelectItem>
-                      <SelectItem value="piani-alimentari">Piani Alimentari Personalizzati</SelectItem>
-                      <SelectItem value="educazione-alimentare">Educazione Alimentare</SelectItem>
+                      {betterOffers.map(offer => (
+                        <SelectItem key={offer.key} value={offer.label}>
+                          {offer.label} — €{(offer.price / 100).toFixed(0)}
+                        </SelectItem>
+                      ))}
+                      {services?.map((service) => (
+                        <SelectItem key={service.id} value={service.title}>
+                          {service.title}
+                        </SelectItem>
+                      ))}
                       <SelectItem value="altro">Altro</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href={bookingHref}>
+                      {selectedBetter ? "Prenota con Better Club" : "Prenota una consulenza"}
+                    </Link>
+                  </Button>
                 </div>
 
                 <div className="space-y-2">
@@ -163,9 +185,9 @@ export default function Contact() {
                   <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Mail className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">pelliccioniarianna.dietista@gmail.com</p>
+                    <p className="break-all text-muted-foreground">pelliccioniarianna.dietista@gmail.com</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Rispondo entro 24 ore
                     </p>

@@ -26,7 +26,8 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        process.cwd(),
+        import.meta.dirname,
+        "../..",
         "client",
         "index.html"
       );
@@ -47,17 +48,14 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // In produzione su Railway, il frontend è servito da Vercel separatamente.
-  // Cerchiamo la cartella dist/public (build frontend) nella root del progetto.
-  const distPath = path.resolve(process.cwd(), "dist", "public");
-  
+  const distPath =
+    process.env.NODE_ENV === "development"
+      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
+      : path.resolve(import.meta.dirname, "public");
   if (!fs.existsSync(distPath)) {
-    console.log(
-      `[Static] Frontend build non trovato in ${distPath}. ` +
-      `In produzione il frontend è servito da Vercel.`
+    console.error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
-    // Non servire file statici — solo API
-    return;
   }
 
   app.use(express.static(distPath));

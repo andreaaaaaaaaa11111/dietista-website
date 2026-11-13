@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Mail, Phone, Calendar, Eye, Trash2, CheckCircle, MessageSquare, Loader2, Menu } from "lucide-react";
+import { Mail, Phone, Calendar, Eye, Trash2, CheckCircle, MessageSquare, Loader2 } from "lucide-react";
 
 export default function ContactMessages() {
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
@@ -81,24 +81,27 @@ export default function ContactMessages() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-sage-600" />
-      </div>
+      <AdminLayout>
+        <div className="flex min-h-[400px] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-sage-600" />
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 rounded-[28px] border border-white/80 bg-white/65 p-6 shadow-[0_14px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div>
-            <h1 className="text-3xl font-bold">Messaggi di Contatto</h1>
-            <p className="text-muted-foreground">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">Comunicazioni</p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Messaggi di Contatto</h1>
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               Gestisci i messaggi ricevuti dal form di contatto
             </p>
           </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-sm">
+          <Badge variant="outline" className="rounded-full border-emerald-100 bg-emerald-50 px-3 py-1.5 text-sm text-emerald-800">
             {messages?.filter((m: any) => m.status === "new").length || 0} nuovi
           </Badge>
         </div>

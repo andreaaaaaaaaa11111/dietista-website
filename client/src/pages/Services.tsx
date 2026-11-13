@@ -2,8 +2,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Clock, Euro, ArrowRight } from "lucide-react";
+import { Clock, Euro, ArrowRight, Check } from "lucide-react";
 import SEO from "@/components/SEO";
+import { formatServiceTitle, getServicePoints } from "@/lib/serviceContent";
 
 export default function Services() {
   const { data: services, isLoading } = trpc.services.list.useQuery();
@@ -20,7 +21,7 @@ export default function Services() {
       <div className="container">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">I Miei Servizi</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">I miei servizi</h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Ti offro una gamma completa di servizi nutrizionali personalizzati per aiutarti 
             a raggiungere i tuoi obiettivi di salute e benessere. Ogni consulenza è studiata 
@@ -49,27 +50,43 @@ export default function Services() {
             {services?.map((service) => (
               <Card key={service.id} className="flex flex-col hover:shadow-xl transition-all border-2 hover:border-primary/50">
                 <CardHeader className="flex-grow">
-                  <CardTitle className="text-2xl mb-3">{service.title}</CardTitle>
+                  <CardTitle className="text-2xl mb-3">{formatServiceTitle(service.title)}</CardTitle>
                   <CardDescription className="text-base leading-relaxed">
                     {service.description}
                   </CardDescription>
+                  <ul className="mt-5 space-y-2.5 border-t pt-5">
+                    {getServicePoints(service.title).map(point => (
+                      <li key={point} className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
+                        <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/10">
+                          <Check className="h-3.5 w-3.5 text-primary" />
+                        </span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between py-3 border-t">
+                  <div className="flex items-center justify-between gap-4 py-3 border-t">
                     <div className="flex items-center space-x-2 text-muted-foreground">
                       <Clock className="h-5 w-5" />
-                      <span className="font-medium">{service.duration} minuti</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Euro className="h-5 w-5 text-primary" />
-                      <span className="text-2xl font-bold text-primary">
-                        {(service.price / 100).toFixed(2)}
+                      <span className="font-medium">
+                        {service.duration > 0 ? `circa ${service.duration} minuti` : "Durata personalizzata"}
                       </span>
                     </div>
+                    {service.price > 0 ? (
+                      <div className="flex items-center space-x-1">
+                        <Euro className="h-5 w-5 text-primary" />
+                        <span className="text-2xl font-bold text-primary">
+                          {(service.price / 100).toFixed(2)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm font-semibold text-primary whitespace-nowrap">Su richiesta</span>
+                    )}
                   </div>
-                  <Link href="/prenota">
+                  <Link href={`/prenota?servizio=${service.id}`}>
                     <Button className="w-full" size="lg">
-                      Prenota Ora
+                      Scopri di più
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -82,7 +99,7 @@ export default function Services() {
         {/* Additional Info */}
         <div className="mt-20 bg-muted/30 rounded-2xl p-8 md:p-12">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Come Funziona</h2>
+            <h2 className="text-3xl font-bold mb-4">Come funziona</h2>
             <div className="grid md:grid-cols-3 gap-8 mt-8">
               <div>
                 <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 text-xl font-bold">
@@ -106,9 +123,12 @@ export default function Services() {
                 <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   3
                 </div>
-                <h3 className="font-semibold mb-2">Piano Personalizzato</h3>
+                <h3 className="font-semibold mb-2">Piano personalizzato</h3>
                 <p className="text-sm text-muted-foreground">
-                  Ricevi il tuo piano alimentare su misura
+                  Ricevi il tuo piano personalizzato
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  Entro 7 giorni lavorativi troverai pronto il tuo piano nella mail fornita nel corso della visita!
                 </p>
               </div>
             </div>

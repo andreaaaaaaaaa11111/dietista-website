@@ -112,11 +112,12 @@ export default function TestimonialManagement() {
 
   return (
     <AdminLayout>
-      <div className="p-8 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 rounded-[28px] border border-white/80 bg-white/65 p-6 shadow-[0_14px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div>
-            <h1 className="text-3xl font-bold">Gestione Testimonianze</h1>
-            <p className="text-muted-foreground">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">Reputazione</p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Gestione Testimonianze</h1>
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               Approva, rifiuta o elimina le recensioni dei clienti
             </p>
           </div>
@@ -126,7 +127,7 @@ export default function TestimonialManagement() {
             )}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="rounded-xl bg-[#153927] shadow-sm hover:bg-[#153927]">
                   <Plus className="h-4 w-4 mr-2" />
                   Aggiungi Manualmente
                 </Button>

@@ -30,6 +30,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/nutrizione-sportiva" className="text-muted-foreground hover:text-primary transition-colors">
+                  Nutrizione Sportiva
+                </Link>
+              </li>
+              <li>
                 <Link href="/chi-sono">
                   <a className="text-muted-foreground hover:text-primary transition-colors">
                     Chi Sono
@@ -57,9 +62,12 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Servizi</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Consulenza Nutrizionale</li>
-              <li>Piani Alimentari Personalizzati</li>
+              <li>Prima Visita Nutrizionale</li>
+              <li>Visita di controllo</li>
+              <li>Prima visita Online</li>
+              <li>Visita di controllo online</li>
               <li>Educazione Alimentare</li>
+              <li>Analisi della composizione corporea (MetaDieta BIA)</li>
             </ul>
           </div>
 

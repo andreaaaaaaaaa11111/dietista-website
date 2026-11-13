@@ -100,9 +100,10 @@ export default function ConsultationManagement() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Gestione Consulenze</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="rounded-[28px] border border-white/80 bg-white/65 p-6 shadow-[0_14px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:p-7">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">Pazienti</p>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Gestione Consulenze</h1>
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
             Visualizza e gestisci tutte le richieste di consulenza ricevute
           </p>
         </div>
@@ -180,7 +181,7 @@ export default function ConsultationManagement() {
 
       {/* Dialog Dettagli */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>Dettagli Consulenza</DialogTitle>
             <DialogDescription>
@@ -190,14 +191,14 @@ export default function ConsultationManagement() {
 
           {selectedConsultation && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Nome</p>
                   <p className="text-lg font-semibold">{selectedConsultation.name}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p className="text-lg font-semibold">{selectedConsultation.email}</p>
+                  <p className="break-all text-lg font-semibold">{selectedConsultation.email}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Telefono</p>
@@ -214,7 +215,7 @@ export default function ConsultationManagement() {
                 <p className="text-base">{selectedConsultation.goal || "Non specificato"}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-2">Condizioni Mediche</p>
                   <p className="text-base">{selectedConsultation.medicalConditions || "Nessuna"}</p>

@@ -71,12 +71,12 @@ export default function Testimonials() {
                   <DialogTrigger asChild>
                     <Button size="lg">
                       <PenLine className="h-5 w-5 mr-2" />
-                      Lascia una Recensione
+                      Lascia una recensione
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Scrivi la tua Recensione</DialogTitle>
+                      <DialogTitle>Scrivi la tua recensione</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
@@ -121,7 +121,7 @@ export default function Testimonials() {
                 <Button size="lg" asChild>
                   <a href={getLoginUrl()}>
                     <PenLine className="h-5 w-5 mr-2" />
-                    Accedi per Lasciare una Recensione
+                    Accedi per lasciare una recensione
                   </a>
                 </Button>
               )}
@@ -228,15 +228,15 @@ export default function Testimonials() {
         <div className="mt-20 grid md:grid-cols-3 gap-8 bg-muted/30 rounded-2xl p-8">
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">{testimonials?.length || 0}</div>
-            <p className="text-muted-foreground">Clienti Soddisfatti</p>
+            <p className="text-muted-foreground">Clienti soddisfatti</p>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">{testimonials?.length ? Math.round((testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length) * 10) / 10 : 0}/5</div>
-            <p className="text-muted-foreground">Valutazione Media</p>
+            <p className="text-muted-foreground">Valutazione media</p>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">{testimonials?.length ? Math.round((testimonials.filter(t => t.rating >= 4).length / testimonials.length) * 100) : 0}%</div>
-            <p className="text-muted-foreground">Grado di Soddisfazione dei Pazienti</p>
+            <p className="text-muted-foreground">Grado di soddisfazione dei pazienti</p>
           </div>
         </div>
       </div>

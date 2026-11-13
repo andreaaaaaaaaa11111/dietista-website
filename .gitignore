@@ -1,5 +1,6 @@
 # Dependencies
 **/node_modules
+**/node_modules.nosync
 .pnpm-store/
 
 # Build outputs
@@ -105,12 +106,9 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
-
-# Vercel
+.project-config.json
+.vercel
+.env*
+!.env.example
 .vercel/
-
-# Railway
-.railway/
-
-# TypeScript build info
-node_modules/typescript/tsbuildinfo
+outputs/

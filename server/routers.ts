@@ -1,3 +1,5 @@
+import { getSessionCookieOptions } from "./_core/cookies";
+import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
@@ -6,6 +8,9 @@ import { notifyOwner } from "./_core/notification";
 import { sendEmail } from "./_core/sendEmail";
 import { invokeLLM } from "./_core/llm";
 import * as db from "./db";
+import * as supabaseDb from "./supabaseDb";
+import { DEFAULT_SERVICES } from "@shared/services";
+import { BETTER_KEYS, betterRequestMessage, getBetterOffers } from "@shared/betterOffers";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -20,9 +25,9 @@ export const appRouter = router({
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    // Il logout è gestito da Clerk lato frontend.
-    // Questa mutation è mantenuta per compatibilità con il codice esistente.
-    logout: publicProcedure.mutation(() => {
+    logout: publicProcedure.mutation(({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
   }),
@@ -30,17 +35,23 @@ export const appRouter = router({
   // ===== SERVICES =====
   services: router({
     list: publicProcedure.query(async () => {
-      return await db.getActiveServices();
+      try {
+        const services = await supabaseDb.getActiveServices();
+        return services.length > 0 ? services : DEFAULT_SERVICES;
+      } catch (error) {
+        console.warn("[Supabase] Services fallback:", error);
+        return DEFAULT_SERVICES;
+      }
     }),
     
-    listAll: adminProcedure.query(async () => {
-      return await db.getAllServices();
+    listAll: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllServices(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
-        return await db.getServiceById(input.id);
+        return (await supabaseDb.getServiceById(input.id)) ?? DEFAULT_SERVICES.find(service => service.id === input.id);
       }),
     
     create: adminProcedure
@@ -50,8 +61,8 @@ export const appRouter = router({
         price: z.number(),
         duration: z.number(),
       }))
-      .mutation(async ({ input }) => {
-        await db.createService(input);
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.createService(supabaseDb.requestAccessToken(ctx.req)!, input);
         return { success: true };
       }),
     
@@ -64,9 +75,9 @@ export const appRouter = router({
         duration: z.number().optional(),
         active: z.boolean().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { id, ...data } = input;
-        await db.updateService(id, data);
+        await supabaseDb.updateService(supabaseDb.requestAccessToken(ctx.req)!, id, data);
         return { success: true };
       }),
   }),
@@ -200,6 +211,8 @@ export const appRouter = router({
     // Invia una nuova richiesta di consulenza
     submit: publicProcedure
       .input(z.object({
+        serviceId: z.number().optional(),
+        betterOffer: z.enum(BETTER_KEYS).optional(),
         name: z.string(),
         email: z.string().email(),
         phone: z.string().optional(),
@@ -214,63 +227,43 @@ export const appRouter = router({
         privacyConsent: z.boolean(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Salva la richiesta di consulenza con userId se l'utente è loggato
-        await db.createConsultationRequest({
-          name: input.name,
-          email: input.email,
-          phone: input.phone,
-          age: input.age,
-          weight: input.weight,
-          height: input.height,
-          goal: input.goal,
-          medicalConditions: input.medicalConditions,
-          allergies: input.allergies,
-          currentDiet: input.currentDiet,
-          message: input.message,
-          privacyConsent: input.privacyConsent,
-          verificationToken: '',
-          status: 'new',
-          privacyConsentDate: new Date(),
-          userId: ctx.user?.id ?? null,
-        });
-        
-        // Non inviare notifiche - richieste salvate solo nel database per la dashboard admin
-        
+        const token = supabaseDb.requestAccessToken(ctx.req);
+        const { betterOffer, ...request } = input;
+        if (betterOffer) {
+          const services = await supabaseDb.getActiveServices();
+          const offer = getBetterOffers(services).find(item => item.key === betterOffer)!;
+          request.serviceId = offer.source.id;
+          request.message = betterRequestMessage(offer, request.message);
+        }
+        await supabaseDb.createConsultationRequest(token, request, ctx.user?.openId);
+        await supabaseDb.trackEvent(
+          token,
+          { eventType: "booking_submitted", path: "/prenota", serviceId: request.serviceId },
+          ctx.user?.openId,
+        );
         return { success: true };
       }),
     
     // Lista consulenze dell'utente loggato (per userId OR email)
     getMyConsultations: protectedProcedure.query(async ({ ctx }) => {
-      // Cerca per userId OR email per coprire tutti i casi:
-      // - Richieste inviate da loggato (hanno userId)
-      // - Richieste inviate prima del login (hanno solo email)
-      // - Utenti Apple con email private relay
-      // Cerca anche per tutti gli userId associati alla stessa email
-      const allUserIds: number[] = [ctx.user.id];
-      if (ctx.user.email) {
-        const sameEmailUsers = await db.getUsersByEmail(ctx.user.email);
-        for (const u of sameEmailUsers) {
-          if (!allUserIds.includes(u.id)) allUserIds.push(u.id);
-        }
-      }
-      return await db.getConsultationRequestsByUserIdsOrEmail(allUserIds, ctx.user.email ?? '');
+      return await supabaseDb.getMyConsultations(supabaseDb.requestAccessToken(ctx.req)!);
     }),
 
     // Lista richieste (admin)
-    list: adminProcedure.query(async () => {
-      return await db.getAllConsultationRequests();
+    list: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllConsultationRequests(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     // Lista tutte le richieste (admin) - alias per compatibilità
-    listAll: adminProcedure.query(async () => {
-      return await db.getAllConsultationRequests();
+    listAll: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllConsultationRequests(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     // Dettaglio richiesta (admin)
     getById: adminProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getConsultationRequestById(input.id);
+      .query(async ({ input, ctx }) => {
+        return await supabaseDb.getConsultationRequestById(supabaseDb.requestAccessToken(ctx.req)!, input.id);
       }),
     
     // Aggiorna stato richiesta (admin)
@@ -279,16 +272,16 @@ export const appRouter = router({
         id: z.number(),
         status: z.enum(['new', 'contacted', 'scheduled', 'completed']),
       }))
-      .mutation(async ({ input }) => {
-        await db.updateConsultationRequest(input.id, { status: input.status });
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.updateConsultationStatus(supabaseDb.requestAccessToken(ctx.req)!, input.id, input.status);
         return { success: true };
       }),
     
     // Elimina richiesta (admin)
     delete: adminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteConsultationRequest(input.id);
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.deleteConsultationRequest(supabaseDb.requestAccessToken(ctx.req)!, input.id);
         return { success: true };
       }),
     
@@ -407,11 +400,11 @@ export const appRouter = router({
   // ===== TESTIMONIALS =====
   testimonials: router({
     list: publicProcedure.query(async () => {
-      return await db.getPublishedTestimonials();
+      return await supabaseDb.getPublishedTestimonials();
     }),
     
-    listAll: adminProcedure.query(async () => {
-      return await db.getAllTestimonials();
+    listAll: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllTestimonials(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     // Utente loggato può creare una recensione (non approvata)
@@ -421,14 +414,13 @@ export const appRouter = router({
         rating: z.number().min(1).max(5),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.createTestimonial({
-          userId: ctx.user.id,
+        await supabaseDb.createTestimonial(supabaseDb.requestAccessToken(ctx.req)!, {
           name: ctx.user.name || 'Utente',
           email: ctx.user.email || undefined,
           content: input.content,
           rating: input.rating,
           approved: false,
-        });
+        }, ctx.user.openId);
         return { success: true };
       }),
     
@@ -439,31 +431,31 @@ export const appRouter = router({
         content: z.string(),
         rating: z.number().min(1).max(5),
       }))
-      .mutation(async ({ input }) => {
-        await db.createTestimonial({ ...input, approved: true });
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.createTestimonial(supabaseDb.requestAccessToken(ctx.req)!, { ...input, approved: true });
         return { success: true };
       }),
     
     // Admin approva recensione
     approve: adminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.updateTestimonial(input.id, { approved: true });
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.updateTestimonial(supabaseDb.requestAccessToken(ctx.req)!, input.id, { approved: true });
         return { success: true };
       }),
     
     // Admin rifiuta recensione (imposta approved a false)
     reject: adminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.updateTestimonial(input.id, { approved: false });
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.updateTestimonial(supabaseDb.requestAccessToken(ctx.req)!, input.id, { approved: false });
         return { success: true };
       }),
     
     delete: adminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteTestimonial(input.id);
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.deleteTestimonial(supabaseDb.requestAccessToken(ctx.req)!, input.id);
         return { success: true };
       }),
   }),
@@ -478,30 +470,20 @@ export const appRouter = router({
         consultationType: z.string().optional(),
         message: z.string(),
       }))
-      .mutation(async ({ input }) => {
-        // Salva il messaggio di contatto
-        await db.createContactRequest({
-          name: input.name,
-          email: input.email,
-          phone: input.phone,
-          consultationType: input.consultationType,
-          message: input.message,
-          status: 'new',
-        });
-        
-        // Le richieste vengono visualizzate solo nella Dashboard Admin
-        // Nessuna notifica email viene inviata
-        
+      .mutation(async ({ input, ctx }) => {
+        const token = supabaseDb.requestAccessToken(ctx.req);
+        await supabaseDb.createContactRequest(token, input);
+        await supabaseDb.trackEvent(token, { eventType: "contact_submitted", path: "/contatti" }, ctx.user?.openId);
         return { success: true };
       }),
     
-    list: adminProcedure.query(async () => {
-      return await db.getAllContactRequests();
+    list: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllContactRequests(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     // Alias per compatibilità
-    listAll: adminProcedure.query(async () => {
-      return await db.getAllContactRequests();
+    listAll: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getAllContactRequests(supabaseDb.requestAccessToken(ctx.req)!);
     }),
     
     updateStatus: adminProcedure
@@ -509,15 +491,15 @@ export const appRouter = router({
         id: z.number(),
         status: z.enum(['new', 'read', 'replied']),
       }))
-      .mutation(async ({ input }) => {
-        await db.updateContactRequestStatus(input.id, input.status);
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.updateContactRequestStatus(supabaseDb.requestAccessToken(ctx.req)!, input.id, input.status);
         return { success: true };
       }),
     
     delete: adminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteContactRequest(input.id);
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.deleteContactRequest(supabaseDb.requestAccessToken(ctx.req)!, input.id);
         return { success: true };
       }),
   }),
@@ -641,7 +623,28 @@ export const appRouter = router({
       .mutation(async ({ ctx: _ctx, input }) => {
         await db.deleteBodyMeasurement(input.id);
         return { success: true };
+    }),
+  }),
+
+  // ===== ANALYTICS =====
+  analytics: router({
+    track: publicProcedure
+      .input(z.object({
+        path: z.string().min(1).max(500),
+        serviceId: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await supabaseDb.trackEvent(
+          supabaseDb.requestAccessToken(ctx.req),
+          { eventType: "page_view", path: input.path, serviceId: input.serviceId },
+          ctx.user?.openId,
+        );
+        return { success: true };
       }),
+
+    dashboard: adminProcedure.query(async ({ ctx }) => {
+      return await supabaseDb.getDashboardStats(supabaseDb.requestAccessToken(ctx.req)!);
+    }),
   }),
 
   // Storage upload endpoint
