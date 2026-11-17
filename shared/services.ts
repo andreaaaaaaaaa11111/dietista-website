@@ -20,7 +20,7 @@ export const DEFAULT_SERVICES: PublicService[] = [
     title: "Prima Visita Nutrizionale",
     description:
       "Valutazione completa dello stato nutrizionale, analisi delle abitudini alimentari e definizione degli obiettivi. Include misurazione composizione corporea e piano alimentare personalizzato.",
-    duration: 60,
+    duration: 90,
     price: 9000,
     active: true,
     order: 1,
@@ -31,7 +31,7 @@ export const DEFAULT_SERVICES: PublicService[] = [
     id: 2,
     title: "Visita di controllo",
     description:
-      "Rivalutazione dei progressi del paziente. Eventuali modifiche al piano nutrizionale inviato.",
+      "Rivalutazione dei progressi del paziente. Eventuali modifiche al piano nutrizionale inviato.\n\n+20 € in caso di cambio o modifica della dieta consegnata in prima visita.\n+30 € per un completo cambiamento del regime alimentare.\nIn caso di cambio dieta, la visita dura circa 60 minuti.",
     duration: 40,
     price: 5000,
     active: true,

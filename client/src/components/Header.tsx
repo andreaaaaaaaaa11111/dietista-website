@@ -13,9 +13,9 @@ export default function Header() {
 
   const navItems = [
     { href: "/", label: "Home" },
+    { href: "/chi-sono", label: "Chi sono" },
     { href: "/servizi", label: "Servizi" },
     { href: "/nutrizione-sportiva", label: "Nutrizione Sportiva" },
-    { href: "/chi-sono", label: "Chi Sono" },
     { href: "/testimonianze", label: "Testimonianze" },
     { href: "/contatti", label: "Contatti" },
   ];

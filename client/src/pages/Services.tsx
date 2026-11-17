@@ -51,7 +51,7 @@ export default function Services() {
               <Card key={service.id} className="flex flex-col hover:shadow-xl transition-all border-2 hover:border-primary/50">
                 <CardHeader className="flex-grow">
                   <CardTitle className="text-2xl mb-3">{formatServiceTitle(service.title)}</CardTitle>
-                  <CardDescription className="text-base leading-relaxed">
+                  <CardDescription className="whitespace-pre-line text-base leading-relaxed">
                     {service.description}
                   </CardDescription>
                   <ul className="mt-5 space-y-2.5 border-t pt-5">
